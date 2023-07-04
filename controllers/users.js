@@ -48,10 +48,17 @@ const getUserById = (req, res) => {
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
+      } else if (err.name === 'CastError') {
+        res
+          .status(ERROR_INCORRECT_DATA)
+          .send({
+            message: 'Некорректный id пользователя',
+          });
       } else {
         res.status(ERROR_SERVER).send({
           message: 'Ошибка по умолчанию',
           err: err.message,
+          name: err.name,
           stack: err.stack,
         });
       }

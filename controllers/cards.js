@@ -52,6 +52,9 @@ const deleteCardById = (req, res) => {
           .send({
             message: 'Запрашиваемая карточка не найдена',
           });
+      } else if (err.name === 'CastError') {
+        res.status(ERROR_INCORRECT_DATA)
+          .send({ message: 'Некорректный id пользователя' });
       } else {
         res.status(ERROR_SERVER).send({
           message: 'Ошибка по умолчанию',
@@ -79,13 +82,14 @@ const likeCard = (req, res) => {
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.message.includes('Validation failed')) {
+      } else if (err.name === 'CastError') {
         res.status(ERROR_INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+          .send({ message: 'Некорректный id пользователя' });
       } else {
         res.status(ERROR_SERVER).send({
           message: 'Ошибка по умолчанию',
           err: err.message,
+          name: err.name,
           stack: err.stack,
         });
       }
@@ -109,9 +113,9 @@ const dislikeCard = (req, res) => {
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.message.includes('Validation failed')) {
+      } else if (err.name === 'CastError') {
         res.status(ERROR_INCORRECT_DATA)
-          .send({ message: 'Переданы некорректные данные при создании пользователя' });
+          .send({ message: 'Некорректный id пользователя' });
       } else {
         res.status(ERROR_SERVER).send({
           message: 'Ошибка по умолчанию',
