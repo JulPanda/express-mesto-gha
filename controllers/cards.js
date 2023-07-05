@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 const Card = require('../models/card');
-const { ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA } = require('../utils/constants');
+const {
+  ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA, STATUS_OK, STATUS_CREATED,
+} = require('../utils/constants');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -9,18 +12,15 @@ const createCard = (req, res) => {
     owner: req.user._id,
   })
     .then((card) => {
-      res.status(201).send(card);
+      res.status(STATUS_CREATED).send(card);
     })
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании карточки' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -28,14 +28,11 @@ const createCard = (req, res) => {
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => {
-      res.status(200).send(cards);
+      res.status(STATUS_OK).send(cards);
     })
     .catch((err) => {
-      res.status(ERROR_SERVER).send({
-        message: 'Ошибка по умолчанию',
-        err: err.message,
-        stack: err.stack,
-      });
+      res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+      console.log(`err: ${err.message}, stack: ${err.stack}`);
     });
 };
 
@@ -43,7 +40,7 @@ const deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not Found'))
     .then((card) => {
-      res.status(200).send(card);
+      res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
@@ -56,11 +53,8 @@ const deleteCardById = (req, res) => {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -73,7 +67,7 @@ const likeCard = (req, res) => {
   )
     .orFail(() => new Error('Not Found'))
     .then((card) => {
-      res.status(200).send(card);
+      res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
@@ -86,12 +80,8 @@ const likeCard = (req, res) => {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          name: err.name,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -104,7 +94,7 @@ const dislikeCard = (req, res) => {
   )
     .orFail(() => new Error('Not Found'))
     .then((card) => {
-      res.status(200).send(card);
+      res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
@@ -117,11 +107,8 @@ const dislikeCard = (req, res) => {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };

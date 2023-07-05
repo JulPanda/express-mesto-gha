@@ -1,22 +1,22 @@
+/* eslint-disable no-console */
 const User = require('../models/user');
-const { ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA } = require('../utils/constants');
+const {
+  ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA, STATUS_OK, STATUS_CREATED,
+} = require('../utils/constants');
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
   User.create({ name, about, avatar })
     .then((user) => {
-      res.status(201).send(user);
+      res.status(STATUS_CREATED).send(user);
     })
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.name === 'ValidationError') {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании пользователя' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -24,14 +24,11 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => {
-      res.status(200).send(users);
+      res.status(STATUS_OK).send(users);
     })
     .catch((err) => {
-      res.status(ERROR_SERVER).send({
-        message: 'Ошибка по умолчанию',
-        err: err.message,
-        stack: err.stack,
-      });
+      res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+      console.log(`err: ${err.message}, stack: ${err.stack}`);
     });
 };
 
@@ -39,15 +36,13 @@ const getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => new Error('Not Found'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(STATUS_OK).send(user);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
         res
           .status(ERROR_NOT_FOUND)
-          .send({
-            message: 'Запрашиваемый пользователь не найден',
-          });
+          .send({ message: 'Запрашиваемый пользователь не найден' });
       } else if (err.name === 'CastError') {
         res
           .status(ERROR_INCORRECT_DATA)
@@ -55,12 +50,8 @@ const getUserById = (req, res) => {
             message: 'Некорректный id пользователя',
           });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          name: err.name,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -70,7 +61,7 @@ const updateUser = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(() => new Error('Not Found'))
     .then((user) => {
-      res.status(200).send({ user });
+      res.status(STATUS_OK).send({ user });
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
@@ -79,15 +70,12 @@ const updateUser = (req, res) => {
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.message.includes('Validation failed')) {
+      } else if (err.name === 'ValidationError') {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании пользователя' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
@@ -97,7 +85,7 @@ const updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(() => new Error('Not Found'))
     .then((user) => {
-      res.status(200).send(user);
+      res.status(STATUS_OK).send(user);
     })
     .catch((err) => {
       if (err.message === 'Not Found') {
@@ -106,15 +94,12 @@ const updateUserAvatar = (req, res) => {
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.message.includes('Validation failed')) {
+      } else if (err.name === 'ValidationError') {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании аватара' });
       } else {
-        res.status(ERROR_SERVER).send({
-          message: 'Ошибка по умолчанию',
-          err: err.message,
-          stack: err.stack,
-        });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
 };
