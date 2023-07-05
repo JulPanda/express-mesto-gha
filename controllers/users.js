@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+const { default: mongoose } = require('mongoose');
 const User = require('../models/user');
 const {
   ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA, STATUS_OK, STATUS_CREATED,
@@ -11,7 +12,7 @@ const createUser = (req, res) => {
       res.status(STATUS_CREATED).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании пользователя' });
       } else {
@@ -34,23 +35,23 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((user) => {
       res.status(STATUS_OK).send(user);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({ message: 'Запрашиваемый пользователь не найден' });
-      } else if (err.name === 'CastError') {
+      } else if (err instanceof mongoose.Error.CastError) {
         res
           .status(ERROR_INCORRECT_DATA)
           .send({
             message: 'Некорректный id пользователя',
           });
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию' });
+        res.status(ERROR_SERVER).send({ message: 'Ошибка по умолчанию', name: err.name });
         console.log(`err: ${err.message}, stack: ${err.stack}`);
       }
     });
@@ -59,18 +60,18 @@ const getUserById = (req, res) => {
 const updateUser = (req, res) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((user) => {
       res.status(STATUS_OK).send({ user });
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.name === 'ValidationError') {
+      } else if (err instanceof mongoose.Error.ValidationError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании пользователя' });
       } else {
@@ -83,18 +84,18 @@ const updateUser = (req, res) => {
 const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((user) => {
       res.status(STATUS_OK).send(user);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.name === 'ValidationError') {
+      } else if (err instanceof mongoose.Error.ValidationError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании аватара' });
       } else {

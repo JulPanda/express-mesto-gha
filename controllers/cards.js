@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+const { default: mongoose } = require('mongoose');
 const Card = require('../models/card');
 const {
   ERROR_NOT_FOUND, ERROR_SERVER, ERROR_INCORRECT_DATA, STATUS_OK, STATUS_CREATED,
@@ -15,7 +16,7 @@ const createCard = (req, res) => {
       res.status(STATUS_CREATED).send(card);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err instanceof mongoose.Error.ValidationError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Переданы некорректные данные при создании карточки' });
       } else {
@@ -38,18 +39,18 @@ const getCards = (req, res) => {
 
 const deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((card) => {
       res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({
             message: 'Запрашиваемая карточка не найдена',
           });
-      } else if (err.name === 'CastError') {
+      } else if (err instanceof mongoose.Error.CastError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {
@@ -65,18 +66,18 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true },
   )
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((card) => {
       res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.name === 'CastError') {
+      } else if (err instanceof mongoose.Error.CastError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {
@@ -92,18 +93,18 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true },
   )
-    .orFail(() => new Error('Not Found'))
+    .orFail()
     .then((card) => {
       res.status(STATUS_OK).send(card);
     })
     .catch((err) => {
-      if (err.message === 'Not Found') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
         res
           .status(ERROR_NOT_FOUND)
           .send({
             message: 'Запрашиваемый пользователь не найден',
           });
-      } else if (err.name === 'CastError') {
+      } else if (err instanceof mongoose.Error.CastError) {
         res.status(ERROR_INCORRECT_DATA)
           .send({ message: 'Некорректный id пользователя' });
       } else {

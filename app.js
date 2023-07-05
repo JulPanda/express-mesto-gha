@@ -17,14 +17,12 @@ app.use((req, res, next) => {
   next();
 });
 
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
+const router = require('./routes');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 app.use(express.json());
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
+app.use(router);
 app.use('*', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемый адрес не существует' });
 });
