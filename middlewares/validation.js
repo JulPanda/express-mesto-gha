@@ -1,7 +1,7 @@
 const { celebrate, Joi } = require('celebrate');
 
-const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
-// const regexLink = /https?:\/\/(w{3}\.)?[a-zA-Z0-9-]+.\@[\w\d-._~:/?/#/!$&'()*+,;=]{1,}#?*$/;
+// const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
+const regexLink = /(https?:\/\/)(www\.)?([a-zA-Z0-9-._~:@%+#?&/()*[],;=])+([a-zA-Z0-9]{1,6})([a-zA-Z0-9-._~:@%+#?&/()*[],;=])*/;
 
 const signupValidate = celebrate({
   body: Joi.object().keys({
@@ -39,12 +39,12 @@ const avatarValidate = celebrate({
   }),
 });
 
-const cardValidate = celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regexLink),
-  }),
-});
+// const cardValidate = celebrate({
+//  body: Joi.object().keys({
+//    name: Joi.string().required().min(2).max(30),
+//    link: Joi.string().required().pattern(regexLink),
+//  }),
+// });
 
 const cardIdValidate = celebrate({
   params: Joi.object().keys({
@@ -58,6 +58,6 @@ module.exports = {
   userIdValidate,
   userValidate,
   avatarValidate,
-  cardValidate,
+  // cardValidate,
   cardIdValidate,
 };
