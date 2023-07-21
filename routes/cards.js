@@ -1,24 +1,19 @@
 /* eslint-disable no-console */
-const { celebrate, Joi } = require('celebrate');
+// const { celebrate, Joi } = require('celebrate');
 const router = require('express').Router();
 
-const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
+// const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
 
 const {
   createCard, getCards, deleteCardById, likeCard, dislikeCard,
 } = require('../controllers/cards');
 
-// const { cardValidate, cardIdValidate } = require('../middlewares/errorHandler');
+const { cardValidate, cardIdValidate } = require('../middlewares/validation');
 
-router.post('/', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(regexLink),
-  }),
-}), createCard);
+router.post('/', cardValidate, createCard);
 router.get('/', getCards);
 router.delete('/:cardId', deleteCardById);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.put('/:cardId/likes', cardIdValidate, likeCard);
+router.delete('/:cardId/likes', cardIdValidate, dislikeCard);
 
 module.exports = router;
