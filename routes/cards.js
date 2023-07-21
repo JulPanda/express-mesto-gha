@@ -2,7 +2,7 @@
 const { celebrate, Joi } = require('celebrate');
 const router = require('express').Router();
 
-const regexLink = /(https?:\/\/)(www\.)?([a-zA-Z0-9-._~:@%+#?&/()*[],;=])+([a-zA-Z0-9]{1,6})([a-zA-Z0-9-._~:@%+#?&/()*[],;=])*/;
+const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
 
 const {
   createCard, getCards, deleteCardById, likeCard, dislikeCard,
