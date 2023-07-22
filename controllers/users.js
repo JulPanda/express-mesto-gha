@@ -107,7 +107,7 @@ const login = (req, res, next) => {
     .select('+password')
     .orFail()
     .then((user) => {
-      console.log(user);
+      // console.log(user);
       bcrypt.compare(String(password), user.password)
         .then((isValidUser) => {
           if (isValidUser) {
@@ -121,7 +121,7 @@ const login = (req, res, next) => {
               httpOnly: true,
               sameSite: true,
             });
-            res.send(user.toJSON());
+            res.send({ user });
           } else {
             next(new ForbiddenError('Не совпадает email или пароль'));
           }
@@ -129,7 +129,7 @@ const login = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new NotFoundError('Запрашиваемый пользователь не найден'));
+        next(new ForbiddenError('Не совпадает email или пароль'));
       } else {
         next(err);
       }
