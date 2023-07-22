@@ -21,7 +21,12 @@ const createUser = (req, res, next) => {
         name, about, avatar, email, password: hashedPassword,
       })
         .then((user) => {
-          res.status(STATUS_CREATED).send(user);
+          res.status(STATUS_CREATED).send({
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+            email: user.email,
+          });
         })
         .catch((err) => {
           if (err instanceof mongoose.Error.ValidationError) {

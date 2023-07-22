@@ -5,7 +5,7 @@ const STATUS_OK = 200;
 const STATUS_CREATED = 201;
 const ERROR_UNAUTHORIZED = 401;
 const ERROR_CONFLICT = 409;
-const ERROR_FORBIDDEN = 403;
+const ERROR_FORBIDDEN = 401;
 
 module.exports = {
   ERROR_NOT_FOUND,
