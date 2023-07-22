@@ -7,7 +7,6 @@ const NotFoundError = require('../errors/notFoundError');
 const CastError = require('../errors/incorrectDataError');
 const UnauthorizedError = require('../errors/unauthorizedError');
 const ConflictError = require('../errors/conflictError');
-const ForbiddenError = require('../errors/forbiddenError');
 
 const { STATUS_OK, STATUS_CREATED } = require('../utils/constants');
 
@@ -47,6 +46,23 @@ const getUsers = (req, res, next) => {
       res.status(STATUS_OK).send(users);
     })
     .catch(next);
+};
+
+const getUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail()
+    .then((users) => {
+      res.status(STATUS_OK).send(users);
+    })
+    .catch((err) => {
+      if (err instanceof mongoose.Error.DocumentNotFoundError) {
+        next(new NotFoundError('Запрашиваемый пользователь не найден'));
+      } else if (err instanceof mongoose.Error.CastError) {
+        next(new CastError('Некорректный id пользователя'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const getUserById = (req, res, next) => {
@@ -128,13 +144,13 @@ const login = (req, res, next) => {
             });
             res.send({ user });
           } else {
-            next(new ForbiddenError('Не совпадает email или пароль'));
+            next(new UnauthorizedError('Не совпадает email или пароль'));
           }
         });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        next(new ForbiddenError('Не совпадает email или пароль'));
+        next(new UnauthorizedError('Не совпадает email или пароль'));
       } else {
         next(err);
       }
@@ -142,5 +158,5 @@ const login = (req, res, next) => {
 };
 
 module.exports = {
-  createUser, getUsers, getUserById, updateUser, updateUserAvatar, login,
+  createUser, getUsers, getUserById, updateUser, updateUserAvatar, login, getUser,
 };
