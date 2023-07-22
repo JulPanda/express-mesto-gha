@@ -1,6 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
 
-// const regexLink = /^(https?:\/\/)?[^\s]*\.(jpg|jpeg|png|gif|bmp|test)$/;
 const regexLink = /^https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
 
 const signupValidate = celebrate({
